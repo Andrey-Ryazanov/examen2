@@ -34,7 +34,7 @@ IncludeTemplateLangFile(__FILE__);
 		
 	</style>
 	<![endif]-->
-
+	<meta name="ex2_meta" content="<?= $APPLICATION->ShowProperty("ex2_meta")?>"/>
 	<title><? $APPLICATION->ShowTitle() ?></title>
 </head>
 
