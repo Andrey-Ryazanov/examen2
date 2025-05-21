@@ -1,0 +1,10 @@
+<?
+if (file_exists($_SERVER["DOCUMENT_ROOT"] . "/local/php_interface/include/ex2_590_1.php"))
+{
+    require_once $_SERVER["DOCUMENT_ROOT"] . "/local/php_interface/include/ex2_590_1.php";
+}
+
+if (file_exists($_SERVER["DOCUMENT_ROOT"] . "/local/php_interface/include/ex2_590_2.php"))
+{
+    require_once $_SERVER["DOCUMENT_ROOT"] . "/local/php_interface/include/ex2_590_2.php";
+}
