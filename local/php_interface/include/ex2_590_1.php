@@ -1,9 +1,10 @@
 <?php
+IncludeModuleLangFile(__FILE__);
 use Bitrix\Main\EventManager;
 
 class ReviewsEventHandler
 {
-    public static function init()
+    public static function init(): void
     {
         $eventManager = EventManager::getInstance();
         $eventManager->addEventHandler(
@@ -17,12 +18,12 @@ class ReviewsEventHandler
             [self::class, 'onBeforeElementUpdateHandler']
         );
     }
-    public static function onBeforeElementAddHandler(&$arFields)
+    public static function onBeforeElementAddHandler(&$arFields): bool
     {
         return self::previewTextChecker($arFields);
     }
     
-    public static function onBeforeElementUpdateHandler(&$arFields)
+    public static function onBeforeElementUpdateHandler(&$arFields): bool
     {
         return self::previewTextChecker($arFields);
     }
@@ -38,8 +39,12 @@ class ReviewsEventHandler
     
         if (mb_strlen($previewText, 'UTF-8') < $minSize) {
             global $APPLICATION;
+            $message = GetMessage(
+                "PREVIEW_TEXT_ERROR_MESSAGE", 
+                ['#LEN#' => mb_strlen($previewText, 'UTF-8')]
+            );
             $APPLICATION->ThrowException(
-                'Текст анонса слишком короткий: ' . mb_strlen($previewText, 'UTF-8')
+                $message
             );
             return false;
         }

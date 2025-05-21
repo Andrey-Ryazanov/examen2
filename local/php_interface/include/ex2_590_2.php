@@ -1,9 +1,12 @@
 <?php
+IncludeModuleLangFile(__FILE__);
 use Bitrix\Main\EventManager;
 
 class ReviewsAuthorEventHandler
 {
-    public static function init()
+    private const AUTHOR_PROPERTY_ID = 10;
+
+    public static function init(): void
     {
         $eventManager = EventManager::getInstance();
         $eventManager->addEventHandler(
@@ -13,20 +16,19 @@ class ReviewsAuthorEventHandler
         );
     }
     
-    public static function onBeforeElementUpdateHandler(&$arFields)
+    public static function onBeforeElementUpdateHandler(&$arFields): void
     {
         self::authorChecker($arFields);
     }
     
-    private static function authorChecker(&$arFields)
+    private static function authorChecker(&$arFields): void
     {
         if ((int)$arFields["IBLOCK_ID"] !== 6) {
             return;
         }
         
         $elementId = $arFields['ID'];
-        $propValues = $arFields['PROPERTY_VALUES'][10] ?? [];
-        $newAuthorId = !empty($propValues) ? reset($propValues)['VALUE'] : null;
+        $newAuthorId = self::extractPropertyValue($arFields['PROPERTY_VALUES'][self::AUTHOR_PROPERTY_ID] ?? []);
 
         $property = \CIBlockElement::GetProperty(
             $arFields['IBLOCK_ID'],
@@ -35,21 +37,45 @@ class ReviewsAuthorEventHandler
             ['CODE' => 'AUTHOR']
         )->GetNext();
         
-        $oldAuthorId = $property['VALUE'];
+        $oldAuthorId = $property['VALUE'] ?? "";
 
-        if ($newAuthorId !== $oldAuthorId)
+        if (self::isChangedAuthor($newAuthorId, $oldAuthorId))
         {
-            $description = sprintf(
-                'В рецензии [%s] изменился автор с [%s] на [%s]',
-                $elementId,
-                $oldAuthorId,
-                $newAuthorId
+            $description = GetMessage(
+                "TEXT_CHANGE_AUTHOR", 
+                [
+                    "#ELEMENT_ID#" => $elementId,
+                    "#OLD_AUTHOR_ID#" => self::formatAuthorValue($oldAuthorId),
+                    "#NEW_AUTHOR_ID#" => self::formatAuthorValue($newAuthorId)
+                ]
             );
+            
             self::logger('INFO', 'ex2_590', 'iblock', $elementId, $description);
         }
     }
 
-    private static function logger($severity, $auditTypeId, $moduleId, $itemId, $description)
+    private static function formatAuthorValue(string $authorId): string
+    {
+        return $authorId !== "" ? $authorId : "нет";
+    }
+
+    private static function isChangedAuthor(string $newAuthorId, string $oldAuthorId): bool
+    {
+        return $newAuthorId !== $oldAuthorId;
+    }
+
+    private static function extractPropertyValue(array $propertyArray): string
+    {
+        foreach ($propertyArray as $key => $item) {
+            if (is_array($item) && array_key_exists('VALUE', $item)) {
+                return $item['VALUE'];
+            }
+        }
+
+        return "";
+    }
+
+    private static function logger($severity, $auditTypeId, $moduleId, $itemId, $description): void
     {
         \CEventLog::Add([
             'SEVERITY' => $severity,
