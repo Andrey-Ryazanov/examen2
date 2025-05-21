@@ -13,3 +13,8 @@ if (file_exists($_SERVER["DOCUMENT_ROOT"] . "/local/php_interface/include/ex2_60
 {
     require_once $_SERVER["DOCUMENT_ROOT"] . "/local/php_interface/include/ex2_600.php";
 }
+
+if (file_exists($_SERVER["DOCUMENT_ROOT"] . "/local/php_interface/include/ex2_610.php"))
+{
+    require_once $_SERVER["DOCUMENT_ROOT"] . "/local/php_interface/include/ex2_610.php";
+}
