@@ -4,7 +4,7 @@ use Bitrix\Main\Mail\Event;
 
 class ChangeUserClassEventHandler
 {
-    public static function init()
+    public static function init(): void
     {
         $eventManager = EventManager::getInstance();
 
@@ -18,12 +18,12 @@ class ChangeUserClassEventHandler
         );
     }
 
-    public static function onBeforeUserUpdateHandler(&$arFields)
+    public static function onBeforeUserUpdateHandler(&$arFields): void
     {
         self::onChangeUserClass($arFields);
     }
 
-    private static function onChangeUserClass(&$arFields)
+    private static function onChangeUserClass(&$arFields): void
     {
         if (empty($arFields['ID'])) {
             return;
@@ -59,7 +59,7 @@ class ChangeUserClassEventHandler
         return $old !== $new;
     }
 
-    private static function eventSender($eventName='', $lid="s1", $messageId='', $cfields=[])
+    private static function eventSender($eventName="", $lid="s1", $messageId="", $cfields=[]): void
     {
         Event::send([                
             "EVENT_NAME" => $eventName,
